@@ -30,7 +30,6 @@
     }
   </style>
   <link rel="stylesheet" href="boost_optimization_files/libs/revealjs/dist/theme/quarto.css">
-  <link rel="stylesheet" href="assets/style/styles.css">
   <link href="boost_optimization_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="boost_optimization_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="boost_optimization_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -338,7 +337,7 @@
 <ol type="1">
 <li>How can we optimize boosts to get rides claimed earlier?</li>
 <li>How can we optimize boosts to reduce the average cost of rides?</li>
-<li>How can we both minimize boost claim time and average cost of rides?<br>
+<li>How can we both minimize boost claim time and minimize average cost of rides?<br>
 </li>
 </ol>
 </section>
@@ -392,14 +391,16 @@
 </section>
 <section id="how-will-we-do-it" class="slide level2">
 <h2>How will we do it?</h2>
-<ul>
+<div style="font-size: 90%;">
+<ol type="1">
 <li>Understand the available trip data</li>
 <li>Generate synthetic driver data for demonstration purposes</li>
 <li>Predict rides that are likely to go unclaimed</li>
 <li>Model the price sensitivity of each driver (in each area for each trip)</li>
 <li>Predict the optimal (minimal) boost amount for each driver that will move that trip over the claim probability threshold</li>
 <li>Analyze optimized boost amounts against the original claimed amounts</li>
-</ul>
+</ol>
+</div>
 </section>
 <section id="understanding-trip-data" class="slide level2">
 <h2>Understanding trip data</h2>
@@ -422,7 +423,7 @@
 10000  7500  2785  1204   272    76    16     4     1     1     1     1 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>How do trips breakdown by geographic area?</code></pre>
+<pre><code>How do trips break down by geographic area?</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -616,8 +617,8 @@ Sacramento Metro              DFW    Orlando Metro
 
     <script>
 
-      function styleCell_3mq49k3b3nbbcbzf2nms(i, j, css_id) {
-          var table = document.getElementById("tinytable_3mq49k3b3nbbcbzf2nms");
+      function styleCell_jef94r5kbtau010f0xj5(i, j, css_id) {
+          var table = document.getElementById("tinytable_jef94r5kbtau010f0xj5");
           var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
           if (cell) {
               console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
@@ -627,7 +628,7 @@ Sacramento Metro              DFW    Orlando Metro
           }
       }
       function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_3mq49k3b3nbbcbzf2nms');
+        var table = document.getElementById('tinytable_jef94r5kbtau010f0xj5');
         var newRow = table.insertRow(i);
         var newCell = newRow.insertCell(0);
         newCell.setAttribute("colspan", colspan);
@@ -635,8 +636,8 @@ Sacramento Metro              DFW    Orlando Metro
         // this may be unsafe, but innerText does not interpret <br>
         newCell.innerHTML = content;
       }
-      function spanCell_3mq49k3b3nbbcbzf2nms(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_3mq49k3b3nbbcbzf2nms");
+      function spanCell_jef94r5kbtau010f0xj5(i, j, rowspan, colspan) {
+        var table = document.getElementById("tinytable_jef94r5kbtau010f0xj5");
         const targetRow = table.rows[i];
         const targetCell = targetRow.cells[j];
         for (let r = 0; r < rowspan; r++) {
@@ -666,15 +667,15 @@ Sacramento Metro              DFW    Orlando Metro
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 11, j: 2 }, { i: 11, j: 1 }, { i: 11, j: 0 }, { i: 11, j: 3 }, { i: 11, j: 6 }, { i: 11, j: 5 }, { i: 11, j: 4 }, { i: 11, j: 7 },  ], css_id: 'tinytable_css_cufr7mtpwubhp94695tu',}, 
-          { positions: [ { i: 9, j: 1 }, { i: 9, j: 0 }, { i: 9, j: 3 }, { i: 9, j: 2 }, { i: 9, j: 5 }, { i: 9, j: 4 }, { i: 9, j: 7 }, { i: 9, j: 6 },  ], css_id: 'tinytable_css_hsw5vdi1eg74uelkwvn9',}, 
-          { positions: [ { i: 0, j: 0 }, { i: 0, j: 3 }, { i: 0, j: 2 }, { i: 0, j: 1 }, { i: 0, j: 4 }, { i: 0, j: 7 }, { i: 0, j: 6 }, { i: 0, j: 5 },  ], css_id: 'tinytable_css_k861jhk92deg2belrsf4',}, 
+          { positions: [ { i: 11, j: 2 }, { i: 11, j: 1 }, { i: 11, j: 0 }, { i: 11, j: 3 }, { i: 11, j: 6 }, { i: 11, j: 5 }, { i: 11, j: 4 }, { i: 11, j: 7 },  ], css_id: 'tinytable_css_pn5d08l1gy3wj8iawf60',}, 
+          { positions: [ { i: 9, j: 1 }, { i: 9, j: 0 }, { i: 9, j: 3 }, { i: 9, j: 2 }, { i: 9, j: 5 }, { i: 9, j: 4 }, { i: 9, j: 7 }, { i: 9, j: 6 },  ], css_id: 'tinytable_css_rbl2qod3uhxj18ynrkal',}, 
+          { positions: [ { i: 0, j: 0 }, { i: 0, j: 3 }, { i: 0, j: 2 }, { i: 0, j: 1 }, { i: 0, j: 4 }, { i: 0, j: 7 }, { i: 0, j: 6 }, { i: 0, j: 5 },  ], css_id: 'tinytable_css_4qxq6cil6ec2ukfc8hg4',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_3mq49k3b3nbbcbzf2nms(cell.i, cell.j, group.css_id);
+                  styleCell_jef94r5kbtau010f0xj5(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -682,12 +683,12 @@ Sacramento Metro              DFW    Orlando Metro
 
     <style>
       /* tinytable css entries after */
-      .table td.tinytable_css_cufr7mtpwubhp94695tu, .table th.tinytable_css_cufr7mtpwubhp94695tu { border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_hsw5vdi1eg74uelkwvn9, .table th.tinytable_css_hsw5vdi1eg74uelkwvn9 { border-top: solid black 0.1em; }
-      .table td.tinytable_css_k861jhk92deg2belrsf4, .table th.tinytable_css_k861jhk92deg2belrsf4 { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+      .table td.tinytable_css_pn5d08l1gy3wj8iawf60, .table th.tinytable_css_pn5d08l1gy3wj8iawf60 { border-bottom: solid #d3d8dc 0.1em; }
+      .table td.tinytable_css_rbl2qod3uhxj18ynrkal, .table th.tinytable_css_rbl2qod3uhxj18ynrkal { border-top: solid black 0.1em; }
+      .table td.tinytable_css_4qxq6cil6ec2ukfc8hg4, .table th.tinytable_css_4qxq6cil6ec2ukfc8hg4 { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_3mq49k3b3nbbcbzf2nms" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="table table-borderless" id="tinytable_jef94r5kbtau010f0xj5" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <thead>
         
               <tr>
@@ -866,8 +867,8 @@ attr(,"class")
 
     <script>
 
-      function styleCell_ax00cudgojy8n1u3ijwh(i, j, css_id) {
-          var table = document.getElementById("tinytable_ax00cudgojy8n1u3ijwh");
+      function styleCell_7jh9u5wbvn6a7laji3bt(i, j, css_id) {
+          var table = document.getElementById("tinytable_7jh9u5wbvn6a7laji3bt");
           var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
           if (cell) {
               console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
@@ -877,7 +878,7 @@ attr(,"class")
           }
       }
       function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_ax00cudgojy8n1u3ijwh');
+        var table = document.getElementById('tinytable_7jh9u5wbvn6a7laji3bt');
         var newRow = table.insertRow(i);
         var newCell = newRow.insertCell(0);
         newCell.setAttribute("colspan", colspan);
@@ -885,8 +886,8 @@ attr(,"class")
         // this may be unsafe, but innerText does not interpret <br>
         newCell.innerHTML = content;
       }
-      function spanCell_ax00cudgojy8n1u3ijwh(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_ax00cudgojy8n1u3ijwh");
+      function spanCell_7jh9u5wbvn6a7laji3bt(i, j, rowspan, colspan) {
+        var table = document.getElementById("tinytable_7jh9u5wbvn6a7laji3bt");
         const targetRow = table.rows[i];
         const targetCell = targetRow.cells[j];
         for (let r = 0; r < rowspan; r++) {
@@ -916,15 +917,15 @@ attr(,"class")
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 13, j: 2 }, { i: 13, j: 1 }, { i: 13, j: 0 }, { i: 13, j: 3 }, { i: 13, j: 6 }, { i: 13, j: 5 }, { i: 13, j: 4 }, { i: 13, j: 7 },  ], css_id: 'tinytable_css_b7k5qx7wn2prmku4o6is',}, 
-          { positions: [ { i: 11, j: 1 }, { i: 11, j: 0 }, { i: 11, j: 3 }, { i: 11, j: 2 }, { i: 11, j: 5 }, { i: 11, j: 4 }, { i: 11, j: 7 }, { i: 11, j: 6 },  ], css_id: 'tinytable_css_eu9whhgj90iz89d5otsv',}, 
-          { positions: [ { i: 0, j: 0 }, { i: 0, j: 3 }, { i: 0, j: 2 }, { i: 0, j: 1 }, { i: 0, j: 4 }, { i: 0, j: 7 }, { i: 0, j: 6 }, { i: 0, j: 5 },  ], css_id: 'tinytable_css_f89lmhu65zf187whfv25',}, 
+          { positions: [ { i: 13, j: 2 }, { i: 13, j: 1 }, { i: 13, j: 0 }, { i: 13, j: 3 }, { i: 13, j: 6 }, { i: 13, j: 5 }, { i: 13, j: 4 }, { i: 13, j: 7 },  ], css_id: 'tinytable_css_ren742ds14tlb9o9v0z6',}, 
+          { positions: [ { i: 11, j: 1 }, { i: 11, j: 0 }, { i: 11, j: 3 }, { i: 11, j: 2 }, { i: 11, j: 5 }, { i: 11, j: 4 }, { i: 11, j: 7 }, { i: 11, j: 6 },  ], css_id: 'tinytable_css_bgf7peuvpcnjkqowy9vf',}, 
+          { positions: [ { i: 0, j: 0 }, { i: 0, j: 3 }, { i: 0, j: 2 }, { i: 0, j: 1 }, { i: 0, j: 4 }, { i: 0, j: 7 }, { i: 0, j: 6 }, { i: 0, j: 5 },  ], css_id: 'tinytable_css_phar4n0c52p6x6j81l9i',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_ax00cudgojy8n1u3ijwh(cell.i, cell.j, group.css_id);
+                  styleCell_7jh9u5wbvn6a7laji3bt(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -932,12 +933,12 @@ attr(,"class")
 
     <style>
       /* tinytable css entries after */
-      .table td.tinytable_css_b7k5qx7wn2prmku4o6is, .table th.tinytable_css_b7k5qx7wn2prmku4o6is { border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_eu9whhgj90iz89d5otsv, .table th.tinytable_css_eu9whhgj90iz89d5otsv { border-top: solid black 0.1em; }
-      .table td.tinytable_css_f89lmhu65zf187whfv25, .table th.tinytable_css_f89lmhu65zf187whfv25 { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+      .table td.tinytable_css_ren742ds14tlb9o9v0z6, .table th.tinytable_css_ren742ds14tlb9o9v0z6 { border-bottom: solid #d3d8dc 0.1em; }
+      .table td.tinytable_css_bgf7peuvpcnjkqowy9vf, .table th.tinytable_css_bgf7peuvpcnjkqowy9vf { border-top: solid black 0.1em; }
+      .table td.tinytable_css_phar4n0c52p6x6j81l9i, .table th.tinytable_css_phar4n0c52p6x6j81l9i { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_ax00cudgojy8n1u3ijwh" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="table table-borderless" id="tinytable_7jh9u5wbvn6a7laji3bt" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <thead>
         
               <tr>
@@ -955,10 +956,10 @@ attr(,"class")
         <tbody>
                 <tr>
                   <td>driver_id</td>
-                  <td>2653</td>
+                  <td>2635</td>
                   <td>0</td>
-                  <td>1761.9</td>
-                  <td>973.8</td>
+                  <td>1759.0</td>
+                  <td>970.4</td>
                   <td>1.0</td>
                   <td>1710.0</td>
                   <td>3492.0</td>
@@ -1104,15 +1105,15 @@ attr(,"class")
 <pre><code># A tibble: 2 × 3
   .metric  .estimator .estimate
   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-1 roc_auc  binary         0.314
-2 accuracy binary         0.711</code></pre>
+1 roc_auc  binary         0.319
+2 accuracy binary         0.709</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$table
           Truth
 Prediction    0    1
-         0  514  341
-         1  346 1173
+         0  490  343
+         1  347 1193
 
 attr(,"class")
 [1] "conf_mat"</code></pre>
@@ -1147,7 +1148,7 @@ attr(,"class")
 <img data-src="assets/img/p_actual_predicted_boost_difference.png" class="r-stretch"><div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
--30.142   0.315   3.430   5.977   9.520  54.810   32.77 </code></pre>
+-23.940   0.350   3.465   6.162   9.660  54.810   32.86 </code></pre>
 </div>
 </div>
 </section>
@@ -1164,7 +1165,7 @@ attr(,"class")
 <ul>
 <li><p>Adding additional driver, rider, location, and historical boost data will make for better models.</p></li>
 <li><p>Need to optimize the optimization approach. The current approach relies on brute force and then sorting and filtering.</p></li>
-<li><p>Additional analysis of individual driver price sensitivity is warranted. A linear model for each driver might be more persuasive, but would require much more data. The nonparameric model does not always show an increase in probability when there is an increase in boost offer size.</p></li>
+<li><p>Additional analysis of individual driver price sensitivity is warranted. A linear model for each driver might be more persuasive, but would require much more data. The nonparametric model does not always show an increase in probability when there is an increase in boost offer size.</p></li>
 </ul>
 </section>
 <section id="confidence-in-approach" class="slide level2">
@@ -1182,7 +1183,9 @@ attr(,"class")
 <li><p>Small-scale beta testing, using experimentation or post-hoc analysis to compare the performance of old and new methods.</p></li>
 <li><p>Have a backup plan if all one-time, limited-time offers fail to produce a claimed ride.</p></li>
 </ul>
-<p>:::</p>
+</section>
+<section id="thank-you" class="title-slide slide level1 center">
+<h1>~ Thank you! ~</h1>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 

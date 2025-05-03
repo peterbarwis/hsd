@@ -3,7 +3,6 @@ title: "boost_optimizing_engine"
 subtitle: "by Pete Barwis"
 format: 
   revealjs:
-    css: assets/style/styles.css
     theme: 
       - simple
 title-slide-attributes:
@@ -20,7 +19,7 @@ execute:
 
 1.  How can we optimize boosts to get rides claimed earlier?
 2.  How can we optimize boosts to reduce the average cost of rides?
-3.  How can we both minimize boost claim time and average cost of rides?\
+3.  How can we both minimize boost claim time and minimize average cost of rides?\
 
 ## Theory
 
@@ -54,12 +53,14 @@ execute:
 
 ## How will we do it?
 
--   Understand the available trip data
--   Generate synthetic driver data for demonstration purposes
--   Predict rides that are likely to go unclaimed
--   Model the price sensitivity of each driver (in each area for each trip)
--   Predict the optimal (minimal) boost amount for each driver that will move that trip over the claim probability threshold
--   Analyze optimized boost amounts against the original claimed amounts
+::: {style="font-size: 90%;"}
+1.  Understand the available trip data
+2.  Generate synthetic driver data for demonstration purposes
+3.  Predict rides that are likely to go unclaimed
+4.  Model the price sensitivity of each driver (in each area for each trip)
+5.  Predict the optimal (minimal) boost amount for each driver that will move that trip over the claim probability threshold
+6.  Analyze optimized boost amounts against the original claimed amounts
+:::
 
 ## Understanding trip data
 
@@ -82,7 +83,7 @@ writeLines(paste("What % of observations in the trip data are duplicate trip rec
 writeLines("What does the distribution of boosts look like?")
 table(d$seq_boost_count)
 
-writeLines("How do trips breakdown by geographic area?")
+writeLines("How do trips break down by geographic area?")
 sort(table(d$origin_metro_area_name))
 ```
 
@@ -300,7 +301,7 @@ print(read_rds("assets/summary_optim_boosts.rds"))
 
 -   Need to optimize the optimization approach. The current approach relies on brute force and then sorting and filtering.
 
--   Additional analysis of individual driver price sensitivity is warranted. A linear model for each driver might be more persuasive, but would require much more data. The nonparameric model does not always show an increase in probability when there is an increase in boost offer size.
+-   Additional analysis of individual driver price sensitivity is warranted. A linear model for each driver might be more persuasive, but would require much more data. The nonparametric model does not always show an increase in probability when there is an increase in boost offer size.
 
 ## Confidence in approach
 
@@ -318,4 +319,4 @@ print(read_rds("assets/summary_optim_boosts.rds"))
 
 -   Have a backup plan if all one-time, limited-time offers fail to produce a claimed ride.
 
-:::
+# \~ Thank you! \~
