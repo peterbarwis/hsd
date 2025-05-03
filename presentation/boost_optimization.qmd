@@ -1,0 +1,321 @@
+---
+title: "boost_optimizing_engine"
+subtitle: "by Pete Barwis"
+format: 
+  revealjs:
+    css: assets/style/styles.css
+    theme: 
+      - simple
+title-slide-attributes:
+  data-background-image: assets/img/hsd_logo.png
+  data-background-size: 20%
+  data-background-position: bottom 50px center
+execute: 
+  warning: false
+  message: false
+  echo: false
+---
+
+## Research questions
+
+1.  How can we optimize boosts to get rides claimed earlier?
+2.  How can we optimize boosts to reduce the average cost of rides?
+3.  How can we both minimize boost claim time and average cost of rides?\
+
+## Theory
+
+-   Theoretical assumptions
+    -   Claim time: is maximized by the incentive to wait for larger boosts
+    -   Boost size: *Drivers* are price sensitive, some more than others
+
+## Hypotheses (alternative)
+
+-   Claim time:
+    -   Removing the incentive to wait (boosts increase as time elapses) and replacing with an incentive to not wait (*one-time, limited-time offer)* will decrease claim time
+    -   Earlier boost offers will reduce claim time
+-   Boost size:
+    -   Boost size optimized by the price sensitivity of each driver will reduce overall boost size
+
+## What are we trying to do?
+
+-   Minimize claim time by:
+    -   Predicting trips that will need boosts and then offering boosts earlier
+-   Minimize boost size by:
+    -   Predicting the likelihood that each driver will claim each trip, given a range of boost sizes
+
+    -   Selecting the boost size and driver(s) for a trip that push the driver over a claim probability threshold
+
+## What are we trying to do (cont)?
+
+-   Minimize both claim time and boosts by:
+    -   Offering optimal boost sizes on a one-time, limited-time offer basis
+
+    -   When the first optimized boost offer goes unclaimed by the most price sensitive driver(s), a second, higher boost offer is made to slightly less price sensitive drivers
+
+## How will we do it?
+
+-   Understand the available trip data
+-   Generate synthetic driver data for demonstration purposes
+-   Predict rides that are likely to go unclaimed
+-   Model the price sensitivity of each driver (in each area for each trip)
+-   Predict the optimal (minimal) boost amount for each driver that will move that trip over the claim probability threshold
+-   Analyze optimized boost amounts against the original claimed amounts
+
+## Understanding trip data
+
+```{r}
+library(tidyverse)
+library(scales)
+library(knitr)
+library(modelsummary)
+
+# Load data
+d <- read_csv("../input/boost_df.csv", show_col_types = FALSE)
+
+
+writeLines(paste("How many trip observations?", length(d$trip_id)))
+
+writeLines(paste("How many unique trips?", length(unique(d$trip_id))))
+
+writeLines(paste("What % of observations in the trip data are duplicate trip records?", percent(sum(duplicated(d$trip_id)) / length(d$trip_id) )))
+
+writeLines("What does the distribution of boosts look like?")
+table(d$seq_boost_count)
+
+writeLines("How do trips breakdown by geographic area?")
+sort(table(d$origin_metro_area_name))
+```
+
+## Understanding boost offers
+
+```{r}
+writeLines("What are average boost offer amounts by sequence?")
+d %>%
+  group_by(seq_boost_count) %>%
+  summarize(average_cumulative_boost = mean(cumulative_boost_amount_cents, na.rm = TRUE) / 100) %>%
+  mutate(as.factor(seq_boost_count)) %>%
+  ggplot(., aes(x = seq_boost_count, y = average_cumulative_boost)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "#F57E44") +
+  scale_x_continuous("Boost Sequence") + 
+  scale_y_continuous("Avg Cumulative Boost Amount", labels = scales::dollar_format()) + 
+  theme_minimal()
+```
+
+## Synthetic driver data
+
+::: {style="font-size: 70%;"}
+-   We need driver data to model price sensitivity by driver. None is provided, so we will generate some.
+-   The idea is to find trips that are most similar within metro area, and assign a synthetic driver id to those trips, assuming the same driver claims the most similar trips.
+-   Create an analytic (numeric) dataset useful for locating similar trips by engineering new features including a numeric day of week, numeric start and end times, numeric metro number, and numeric trip starts during peak hours.
+-   Remove observations that aren't completed trips, so boosted trip records that were not claimed are removed, leaving only claimed trips.
+-   Loop over metro area, defining a conditional number of clusters within that area relative to the number of trips, and using k-means cluster analysis to assign cluster (aka driver) id numbers to each completed trip.
+-   The result is a set of driver ids, each with multiple trips within each metro area, which have some covariance that may be useful for predictive modeling.
+:::
+
+## K-Means driver assignment example
+
+![](assets/img/cluster_driver_example.png){fig-align="center"}
+
+## Synthetic driver statistics
+
+Tables show head and tail of driver id data.frame
+
+::: {style="font-size: 60%;"}
+```{r}
+d_ids <- read_csv("assets/d_ids.csv")
+
+d_ids %>%
+  group_by(metro_num) %>%
+  summarize(total_trips = length(unique(trip_id)),
+            total_drivers = length(unique(driver_id))) %>%
+  arrange(desc(total_trips)) %>%
+  head(.) %>%
+  kable(.)
+
+d_ids %>%
+  group_by(metro_num) %>%
+  summarize(total_trips = length(unique(trip_id)),
+            total_drivers = length(unique(driver_id))) %>%
+  arrange(desc(total_trips)) %>%
+  tail(.) %>%
+  kable(.)
+```
+:::
+
+## Predict unclaimed rides
+
+::: {style="font-size: 60%;"}
+-   If we predict unclaimed rides at the time of trip creation, we could offer boosts before wait time becomes worrisome.
+
+-   To do that, we need to predict trips as they are measured at the time of creation, with limited information.
+
+-   Remove leakage, which is information that is related to/explains the outcome that isn't known at the time of prediction (claimed_at, unclaimed_at, dollars_paid_to_driver, commute_minutes, etc).
+
+-   Limit the trip data to only the first observation, before boosts are added.
+
+-   Convert predictors to numeric, split data into train/test sets, fit a Random Forest classification model that predicts `ever_unclaimed`.
+
+-   The Random Forest model performs better than XGBoost on this problem, but the overall model fit is poor.
+
+-   To try to make this model as useful as possible for this exercise, given its limitations, I refit the model on the full training set, and predict all trips in the training set (in-sample prediction), using the model fit to the same data.
+
+-   Use these early warning unclaimed ride predictions as the trips to optimize using a boost optimization method.
+:::
+
+## Time potentially saved
+
+How much time could we save by predicting unclaimed rides and making boost offers earlier?
+
+::: {style="font-size: 60%;"}
+The following shows the distribution of time elapsed before an initial boost offer is made. Theoretically, this elapsed time could be reduce to a day or so, if predictions are made daily.
+:::
+
+::::: columns
+::: {.column width="50%"}
+```{r}
+# Calculate average elapsed time from trip creation and first boost offer.
+# Most of this elapsed time could be eliminated if boost offers were made as 
+# soon as a model predicts it will go unclaimed.
+d_first_boost_offered <- d %>%
+  arrange(trip_id, seq_boost_count) %>%
+  filter(seq_boost_count == 1) %>%
+  select(created_at, boost_timestamp) %>%
+  mutate(days_to_first_boost = as.numeric(difftime(boost_timestamp, 
+                                                   created_at, units = "days")))
+
+t <- days_to_first_boost_summary <- d_first_boost_offered %>%
+  summarize(min_days = min(days_to_first_boost),
+            mean_days = mean(days_to_first_boost),
+            max_days = max(days_to_first_boost)) %>%
+  kable(.)
+
+print(t)
+
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+p <- ggplot(d_first_boost_offered, aes(x = days_to_first_boost)) +
+  geom_histogram(fill = "#F57E44", color = "grey") +
+  theme_minimal()
+
+plot(p)
+```
+:::
+:::::
+
+## Unclaimed model analytic dataset
+
+::: {style="font-size: 50%;"}
+```{r}
+read_rds("assets/d_unclaimed.rds")
+```
+:::
+
+## Unclaimed model performance
+
+::: {style="font-size: 80%;"}
+-   These performance statistics are calculated from 1/5 test set.
+-   Performance is poor here, but in real life, HopSkipDrive's additional rider and trip location data would very likely produce a powerful model.
+:::
+
+```{r}
+unclaimed_auc <- read_csv("assets/unclaimed_auc.csv")
+unclaimed_accuracy <- read_csv("assets/unclaimed_accuracy.csv")
+print(bind_rows(unclaimed_auc, unclaimed_accuracy))
+print(read_rds("assets/unclaimed_conf_mat.rds"))
+```
+
+## Model driver price sensitivity
+
+-   The idea is to model driver price sensitivity, and then apply that model to find the driver with the lowest boost price for a trip that still increases the probability of claiming that trip above the threshold (0.5)
+-   To do this, we fit a nonparametric predictive model to boosted trips, predicting the likelihood each trip will be claimed, given boosted offer amounts and other trip predictors.
+-   With enough trees, a nonparametric model will identify varying amounts of price sensitivity for each driver.
+
+## Price sensitivity model analytic dataset
+
+::: {style="font-size: 50%;"}
+```{r}
+
+read_rds("assets/d_boost.rds")
+```
+:::
+
+## Price sensitivity model performance
+
+::: {style="font-size: 80%;"}
+-   These performance statistics are calculated from 1/5 test set.
+-   Performance is poor here, but in real life, HopSkipDrive's additional rider and trip location data would very likely produce a powerful model.
+:::
+
+```{r}
+boosted_auc <- read_csv("assets/boosted_auc.csv")
+boosted_accuracy <- read_csv("assets/boosted_accuracy.csv")
+print(bind_rows(boosted_auc, boosted_accuracy))
+print(read_rds("assets/boosted_conf_mat.rds"))
+```
+
+## Optimize boost amounts
+
+::: {style="font-size: 80%;"}
+-   Create a simulated dataset that contains, for a given metro area, every possible combination of drivers, trips, and 10 different boost offers (at deciles of actual boost distribution).
+-   Apply the predictive model to each metro area dataset and predict how likely each driver is to claim each trip given the boost offer size.
+-   Filter the results by selecting only trips where the prediction exceeds the threshold, and sort the remaining by smallest boost size, then highest probability.
+-   The result is a list of drivers joined to the trips that they are likely to claim given the smallest possible boost size.
+-   This method could be used iteratively to select the next most price sensitive set of drivers, requiring a slightly greater boost offer amount, to support the one-time, limited-time offer approach.
+:::
+
+## Compare actual with optimized boosts
+
+::: {style="font-size: 70%;"}
+Distribution of Actual versus Optimized Boost Offers: Optimized offers cluster much closer to zero.
+:::
+
+![](assets/img/p_actual_predicted_boost_dist.png)
+
+## Distribution of boost cost savings
+
+::: {style="font-size: 70%;"}
+Distribution of Actual Minus Optimized Boost Offers: Blue positive values indicate the amount of money likely saved with optimization.
+:::
+
+![](assets/img/p_actual_predicted_boost_difference.png)
+
+```{r}
+print(read_rds("assets/summary_optim_boosts.rds"))
+```
+
+## Main recommendations
+
+-   Predicting rides that are likely to go unclaimed could enable boost offers to be made 80 days earlier on average.
+
+-   Boost offers, if optimized according to driver price sensitivity, could be reduced by \$6 on average.
+
+-   Making one-time, limited-time boost offers using a driver-specific price sensitivity model removes the incentive to wait, adds an incentive to act, and provides fair compensation to the driver.
+
+## Future work
+
+-   Adding additional driver, rider, location, and historical boost data will make for better models.
+
+-   Need to optimize the optimization approach. The current approach relies on brute force and then sorting and filtering.
+
+-   Additional analysis of individual driver price sensitivity is warranted. A linear model for each driver might be more persuasive, but would require much more data. The nonparameric model does not always show an increase in probability when there is an increase in boost offer size.
+
+## Confidence in approach
+
+-   I believe the approach itself is sound, but real life constraints and incomplete information on my side may have missed some hurdles to implementation.
+
+## Delivering this at scale
+
+-   Optimize the optimization method.
+
+-   Scale up models with additional data and complexity.
+
+-   Implement batch jobs to generate predictions and boost recommendations, and load into warehouse/db.
+
+-   Small-scale beta testing, using experimentation or post-hoc analysis to compare the performance of old and new methods.
+
+-   Have a backup plan if all one-time, limited-time offers fail to produce a claimed ride.
+
+:::
