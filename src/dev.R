@@ -1,5 +1,3 @@
-#| message: false
-#| warning: false
 # Load packages
 library(tidyverse) # data handling tools
 library(lubridate) # date handling
