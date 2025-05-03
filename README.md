@@ -4,7 +4,7 @@
 
 ## Project structure
 
-This is an RStudio Quarto project. The results of this analysis are written up and presented in a rendered HTML Quarto presentation file located [here](presentation/boost_optimization.html). This presentation is intended to serve as a means for discussing this project with a panel and providing the documentation/write-up required for this take-home assignment.
+This is an RStudio Quarto project. The results of this analysis are written up and presented in a rendered HTML Quarto presentation file located [here](https://peterbarwis.github.io/hsd/presentation/boost_optimization.html). This presentation is intended to serve as a means for discussing this project with a panel and providing the documentation/write-up required for this take-home assignment.
 
 The source file to run the analysis is located [here](src/dev.R). This source file needs to be executed in full to generate the objects needed to render the Quarto presentation. A top-level directory called `input` needs to be created, and the `boosts_df.csv` file placed in it, to run this analysis. The source file contains additional comments to explain why various decisions were made.
 
