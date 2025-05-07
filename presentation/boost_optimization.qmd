@@ -177,11 +177,10 @@ print(t)
 
 ::: {.column width="50%"}
 ```{r}
-p <- ggplot(d_first_boost_offered, aes(x = days_to_first_boost)) +
+#| fig-height: 5
+ggplot(d_first_boost_offered, aes(x = days_to_first_boost)) +
   geom_histogram(fill = "#F57E44", color = "grey") +
   theme_minimal()
-
-plot(p)
 ```
 :::
 :::::
@@ -279,9 +278,9 @@ print(read_rds("assets/summary_optim_boosts.rds"))
 
 -   Adding additional driver, rider, location, and historical boost data will make for better models.
 
--   Need to optimize the optimization approach. The current approach relies on brute force and then sorting and filtering.
+-   Needs to solve the cold start problem for new drivers with no price sensitivity data. Perhaps a collaborative filtering-type approach.
 
--   Additional analysis of individual driver price sensitivity is warranted. A linear model for each driver might be more persuasive, but would require much more data. The nonparametric model does not always show an increase in probability when there is an increase in boost offer size.
+-   Additional analysis of individual driver price sensitivity is warranted. A linear model for each driver might be more persuasive, but would require more data. The nonparametric model does not always show an increase in probability when there is an increase in boost offer size.
 
 ## Confidence in approach
 
