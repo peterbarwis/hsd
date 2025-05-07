@@ -115,15 +115,13 @@ table(d$seq_boost_count)
 ## Synthetic driver data covariance
 
 ::: {style="font-size: 60%;"}
-How much of the variation in the driver data is explained by the driver-level?
-If we pick two trips at random, how much of the difference in each feature is because they belong to different drivers?
+How much of the variation in the driver data is explained by the driver-level? If we pick two trips at random, how much of the difference in each feature is because they belong to different drivers?
 :::
 
 ```{r}
 icc_plot <- read_rds("assets/img/icc_plot.rds")
 icc_plot
 ```
-
 
 ## Predict unclaimed rides
 
@@ -288,6 +286,23 @@ print(read_rds("assets/summary_optim_boosts.rds"))
 ## Confidence in approach
 
 -   I believe the approach itself is sound, but real life constraints and incomplete information on my side may have missed some hurdles to implementation.
+
+## Deploying to production
+
+::: {style="font-size: 80%;"}
+-   Use local or SageMaker env to preprocess training data, iteratively fit sci-kit models, and evaluate performance. This becomes the model training source code.
+-   Store models as compressed pickle files on S3
+-   Write scheduled Python job in DAG orchestrator (Airflow, Dagster, etc.) that runs daily. The job:
+    -   Queries and preprocesses prediction data using same logic as model training source
+
+    -   Loads stored compressed models from S3
+
+    -   Applies models to prediction data and generates predictions
+
+    -   Writes predictions to S3 or inserts into db or warehouse
+
+    -   Engineering apps retrieve predictions and use in production
+:::
 
 ## Delivering this at scale
 

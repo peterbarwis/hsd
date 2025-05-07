@@ -523,8 +523,8 @@ Sacramento Metro              DFW    Orlando Metro
 
     <script>
 
-      function styleCell_jduclghaosak5aoip9j6(i, j, css_id) {
-          var table = document.getElementById("tinytable_jduclghaosak5aoip9j6");
+      function styleCell_lp9r8gcq56t3zqaikr8d(i, j, css_id) {
+          var table = document.getElementById("tinytable_lp9r8gcq56t3zqaikr8d");
           var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
           if (cell) {
               console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
@@ -534,7 +534,7 @@ Sacramento Metro              DFW    Orlando Metro
           }
       }
       function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_jduclghaosak5aoip9j6');
+        var table = document.getElementById('tinytable_lp9r8gcq56t3zqaikr8d');
         var newRow = table.insertRow(i);
         var newCell = newRow.insertCell(0);
         newCell.setAttribute("colspan", colspan);
@@ -542,8 +542,8 @@ Sacramento Metro              DFW    Orlando Metro
         // this may be unsafe, but innerText does not interpret <br>
         newCell.innerHTML = content;
       }
-      function spanCell_jduclghaosak5aoip9j6(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_jduclghaosak5aoip9j6");
+      function spanCell_lp9r8gcq56t3zqaikr8d(i, j, rowspan, colspan) {
+        var table = document.getElementById("tinytable_lp9r8gcq56t3zqaikr8d");
         const targetRow = table.rows[i];
         const targetCell = targetRow.cells[j];
         for (let r = 0; r < rowspan; r++) {
@@ -573,15 +573,15 @@ Sacramento Metro              DFW    Orlando Metro
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 11, j: 2 }, { i: 11, j: 1 }, { i: 11, j: 0 }, { i: 11, j: 3 }, { i: 11, j: 6 }, { i: 11, j: 5 }, { i: 11, j: 4 }, { i: 11, j: 7 },  ], css_id: 'tinytable_css_dhs08388iiqcygflwnb9',}, 
-          { positions: [ { i: 9, j: 1 }, { i: 9, j: 0 }, { i: 9, j: 3 }, { i: 9, j: 2 }, { i: 9, j: 5 }, { i: 9, j: 4 }, { i: 9, j: 7 }, { i: 9, j: 6 },  ], css_id: 'tinytable_css_7a4lbcqxkzv9gmntqg6a',}, 
-          { positions: [ { i: 0, j: 0 }, { i: 0, j: 3 }, { i: 0, j: 2 }, { i: 0, j: 1 }, { i: 0, j: 4 }, { i: 0, j: 7 }, { i: 0, j: 6 }, { i: 0, j: 5 },  ], css_id: 'tinytable_css_2g0l4xg7jxxvluift5pp',}, 
+          { positions: [ { i: 11, j: 2 }, { i: 11, j: 1 }, { i: 11, j: 0 }, { i: 11, j: 3 }, { i: 11, j: 6 }, { i: 11, j: 5 }, { i: 11, j: 4 }, { i: 11, j: 7 },  ], css_id: 'tinytable_css_92ww79s65jv9lvu7m36v',}, 
+          { positions: [ { i: 9, j: 1 }, { i: 9, j: 0 }, { i: 9, j: 3 }, { i: 9, j: 2 }, { i: 9, j: 5 }, { i: 9, j: 4 }, { i: 9, j: 7 }, { i: 9, j: 6 },  ], css_id: 'tinytable_css_t63gnb0lwm3dqm5eahwc',}, 
+          { positions: [ { i: 0, j: 0 }, { i: 0, j: 3 }, { i: 0, j: 2 }, { i: 0, j: 1 }, { i: 0, j: 4 }, { i: 0, j: 7 }, { i: 0, j: 6 }, { i: 0, j: 5 },  ], css_id: 'tinytable_css_oa4ay3lzyx4ww2r5y6mn',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_jduclghaosak5aoip9j6(cell.i, cell.j, group.css_id);
+                  styleCell_lp9r8gcq56t3zqaikr8d(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -589,12 +589,12 @@ Sacramento Metro              DFW    Orlando Metro
 
     <style>
       /* tinytable css entries after */
-      .table td.tinytable_css_dhs08388iiqcygflwnb9, .table th.tinytable_css_dhs08388iiqcygflwnb9 { border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_7a4lbcqxkzv9gmntqg6a, .table th.tinytable_css_7a4lbcqxkzv9gmntqg6a { border-top: solid black 0.1em; }
-      .table td.tinytable_css_2g0l4xg7jxxvluift5pp, .table th.tinytable_css_2g0l4xg7jxxvluift5pp { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+      .table td.tinytable_css_92ww79s65jv9lvu7m36v, .table th.tinytable_css_92ww79s65jv9lvu7m36v { border-bottom: solid #d3d8dc 0.1em; }
+      .table td.tinytable_css_t63gnb0lwm3dqm5eahwc, .table th.tinytable_css_t63gnb0lwm3dqm5eahwc { border-top: solid black 0.1em; }
+      .table td.tinytable_css_oa4ay3lzyx4ww2r5y6mn, .table th.tinytable_css_oa4ay3lzyx4ww2r5y6mn { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_jduclghaosak5aoip9j6" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="table table-borderless" id="tinytable_lp9r8gcq56t3zqaikr8d" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <thead>
         
               <tr>
@@ -773,8 +773,8 @@ attr(,"class")
 
     <script>
 
-      function styleCell_7risqia1h6qan6eqvqh0(i, j, css_id) {
-          var table = document.getElementById("tinytable_7risqia1h6qan6eqvqh0");
+      function styleCell_u4r02cjkcxtpihnihplg(i, j, css_id) {
+          var table = document.getElementById("tinytable_u4r02cjkcxtpihnihplg");
           var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
           if (cell) {
               console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
@@ -784,7 +784,7 @@ attr(,"class")
           }
       }
       function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_7risqia1h6qan6eqvqh0');
+        var table = document.getElementById('tinytable_u4r02cjkcxtpihnihplg');
         var newRow = table.insertRow(i);
         var newCell = newRow.insertCell(0);
         newCell.setAttribute("colspan", colspan);
@@ -792,8 +792,8 @@ attr(,"class")
         // this may be unsafe, but innerText does not interpret <br>
         newCell.innerHTML = content;
       }
-      function spanCell_7risqia1h6qan6eqvqh0(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_7risqia1h6qan6eqvqh0");
+      function spanCell_u4r02cjkcxtpihnihplg(i, j, rowspan, colspan) {
+        var table = document.getElementById("tinytable_u4r02cjkcxtpihnihplg");
         const targetRow = table.rows[i];
         const targetCell = targetRow.cells[j];
         for (let r = 0; r < rowspan; r++) {
@@ -823,15 +823,15 @@ attr(,"class")
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 13, j: 2 }, { i: 13, j: 1 }, { i: 13, j: 0 }, { i: 13, j: 3 }, { i: 13, j: 6 }, { i: 13, j: 5 }, { i: 13, j: 4 }, { i: 13, j: 7 },  ], css_id: 'tinytable_css_l7zi9d7mwabyd8uazyn1',}, 
-          { positions: [ { i: 11, j: 1 }, { i: 11, j: 0 }, { i: 11, j: 3 }, { i: 11, j: 2 }, { i: 11, j: 5 }, { i: 11, j: 4 }, { i: 11, j: 7 }, { i: 11, j: 6 },  ], css_id: 'tinytable_css_pbd9kyreotzrew9a3dkq',}, 
-          { positions: [ { i: 0, j: 0 }, { i: 0, j: 3 }, { i: 0, j: 2 }, { i: 0, j: 1 }, { i: 0, j: 4 }, { i: 0, j: 7 }, { i: 0, j: 6 }, { i: 0, j: 5 },  ], css_id: 'tinytable_css_mtbqaxm32id7ynhxhpcd',}, 
+          { positions: [ { i: 13, j: 2 }, { i: 13, j: 1 }, { i: 13, j: 0 }, { i: 13, j: 3 }, { i: 13, j: 6 }, { i: 13, j: 5 }, { i: 13, j: 4 }, { i: 13, j: 7 },  ], css_id: 'tinytable_css_5g1m3jrbzgb9v0yhhwvn',}, 
+          { positions: [ { i: 11, j: 1 }, { i: 11, j: 0 }, { i: 11, j: 3 }, { i: 11, j: 2 }, { i: 11, j: 5 }, { i: 11, j: 4 }, { i: 11, j: 7 }, { i: 11, j: 6 },  ], css_id: 'tinytable_css_59z56uk99ihxweivgrmg',}, 
+          { positions: [ { i: 0, j: 0 }, { i: 0, j: 3 }, { i: 0, j: 2 }, { i: 0, j: 1 }, { i: 0, j: 4 }, { i: 0, j: 7 }, { i: 0, j: 6 }, { i: 0, j: 5 },  ], css_id: 'tinytable_css_88z5rhdh5vqkx40xmde6',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_7risqia1h6qan6eqvqh0(cell.i, cell.j, group.css_id);
+                  styleCell_u4r02cjkcxtpihnihplg(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -839,12 +839,12 @@ attr(,"class")
 
     <style>
       /* tinytable css entries after */
-      .table td.tinytable_css_l7zi9d7mwabyd8uazyn1, .table th.tinytable_css_l7zi9d7mwabyd8uazyn1 { border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_pbd9kyreotzrew9a3dkq, .table th.tinytable_css_pbd9kyreotzrew9a3dkq { border-top: solid black 0.1em; }
-      .table td.tinytable_css_mtbqaxm32id7ynhxhpcd, .table th.tinytable_css_mtbqaxm32id7ynhxhpcd { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+      .table td.tinytable_css_5g1m3jrbzgb9v0yhhwvn, .table th.tinytable_css_5g1m3jrbzgb9v0yhhwvn { border-bottom: solid #d3d8dc 0.1em; }
+      .table td.tinytable_css_59z56uk99ihxweivgrmg, .table th.tinytable_css_59z56uk99ihxweivgrmg { border-top: solid black 0.1em; }
+      .table td.tinytable_css_88z5rhdh5vqkx40xmde6, .table th.tinytable_css_88z5rhdh5vqkx40xmde6 { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_7risqia1h6qan6eqvqh0" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="table table-borderless" id="tinytable_u4r02cjkcxtpihnihplg" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <thead>
         
               <tr>
@@ -1079,6 +1079,23 @@ attr(,"class")
 <ul>
 <li>I believe the approach itself is sound, but real life constraints and incomplete information on my side may have missed some hurdles to implementation.</li>
 </ul>
+</section>
+<section id="deploying-to-production" class="slide level2">
+<h2>Deploying to production</h2>
+<div style="font-size: 80%;">
+<ul>
+<li>Use local or SageMaker env to preprocess training data, iteratively fit sci-kit models, and evaluate performance. This becomes the model training source code.</li>
+<li>Store models as compressed pickle files on S3</li>
+<li>Write scheduled Python job in DAG orchestrator (Airflow, Dagster, etc.) that runs daily. The job:
+<ul>
+<li><p>Queries and preprocesses prediction data using same logic as model training source</p></li>
+<li><p>Loads stored compressed models from S3</p></li>
+<li><p>Applies models to prediction data and generates predictions</p></li>
+<li><p>Writes predictions to S3 or inserts into db or warehouse</p></li>
+<li><p>Engineering apps retrieve predictions and use in production</p></li>
+</ul></li>
+</ul>
+</div>
 </section>
 <section id="delivering-this-at-scale" class="slide level2">
 <h2>Delivering this at scale</h2>
