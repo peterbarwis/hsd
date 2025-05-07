@@ -148,7 +148,7 @@ icc_plot
 How much time could we save by predicting unclaimed rides and making boost offers earlier?
 
 ::: {style="font-size: 60%;"}
-The following shows the distribution of time elapsed before an initial boost offer is made. Theoretically, this elapsed time could be reduce to a day or so, if predictions are made daily.
+The following shows the distribution of time elapsed before an initial boost offer is made. Theoretically, this elapsed time could be reduced to one day, if predictions are made daily.
 :::
 
 ::::: columns
