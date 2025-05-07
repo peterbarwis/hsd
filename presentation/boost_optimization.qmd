@@ -30,36 +30,29 @@ execute:
 ## Hypotheses (alternative)
 
 -   Claim time:
-    -   Removing the incentive to wait (boosts increase as time elapses) and replacing with an incentive to not wait (*one-time, limited-time offer)* will decrease claim time
-    -   Earlier boost offers will reduce claim time
+    -   *H1*: Switching from escalating boosts to *one‑time, limited‑time* boosts will shorten claim time.
+    -   *H2*: Making boost offers earlier by using unclaimed predictions will shorten claim time.
 -   Boost size:
-    -   Boost size optimized by the price sensitivity of each driver will reduce overall boost size
+    -   *H3*: Personalizing the boost to the driver’s price sensitivity will lower average boost price.
 
 ## What are we trying to do?
 
--   Minimize claim time by:
-    -   Predicting trips that will need boosts and then offering boosts earlier
--   Minimize boost size by:
-    -   Predicting the likelihood that each driver will claim each trip, given a range of boost sizes
-
-    -   Selecting the boost size and driver(s) for a trip that push the driver over a claim probability threshold
-
-## What are we trying to do (cont)?
-
--   Minimize both claim time and boosts by:
-    -   Offering optimal boost sizes on a one-time, limited-time offer basis
-
-    -   When the first optimized boost offer goes unclaimed by the most price sensitive driver(s), a second, higher boost offer is made to slightly less price sensitive drivers
+1.  Driver model
+    -   Identifies drivers in synthetic trip data so we can optimize their behavior
+2.  Early warning model
+    -   Flags trips that will go unclaimed so we can act before the wait clock starts
+3.  Price sensitivity model
+    -   Predicts the probability each driver will claim a specific trip across a range of boost amounts
 
 ## How will we do it?
 
 ::: {style="font-size: 90%;"}
 1.  Understand the available trip data
-2.  Generate synthetic driver data for demonstration purposes
-3.  Predict rides that are likely to go unclaimed
-4.  Model the price sensitivity of each driver (in each area for each trip)
+2.  Fit driver model(s) and predict driver data
+3.  Fit the unclaimed ride model and predict unclaimed rides
+4.  Fit the price sensitivity model
 5.  Predict the optimal (minimal) boost amount for each driver that will move that trip over the claim probability threshold
-6.  Analyze optimized boost amounts against the original claimed amounts
+6.  Compare optimized boost amounts against actual amounts
 :::
 
 ## Understanding trip data
@@ -74,14 +67,11 @@ library(modelsummary)
 d <- read_csv("../input/boost_df.csv", show_col_types = FALSE)
 
 
-writeLines(paste("How many trip observations?", length(d$trip_id)))
+writeLines(paste("How many trip observations?", scales::comma(length(d$trip_id))))
 
-writeLines(paste("How many unique trips?", length(unique(d$trip_id))))
+writeLines(paste("How many unique trips?", scales::comma(length(unique(d$trip_id)))))
 
 writeLines(paste("What % of observations in the trip data are duplicate trip records?", percent(sum(duplicated(d$trip_id)) / length(d$trip_id) )))
-
-writeLines("What does the distribution of boosts look like?")
-table(d$seq_boost_count)
 
 writeLines("How do trips break down by geographic area?")
 sort(table(d$origin_metro_area_name))
@@ -90,6 +80,7 @@ sort(table(d$origin_metro_area_name))
 ## Understanding boost offers
 
 ```{r}
+
 writeLines("What are average boost offer amounts by sequence?")
 d %>%
   group_by(seq_boost_count) %>%
@@ -100,12 +91,16 @@ d %>%
   scale_x_continuous("Boost Sequence") + 
   scale_y_continuous("Avg Cumulative Boost Amount", labels = scales::dollar_format()) + 
   theme_minimal()
+
+writeLines("What does the distribution of boosts look like?")
+table(d$seq_boost_count)
+
 ```
 
-## Synthetic driver data
+## Synthetic driver model
 
 ::: {style="font-size: 70%;"}
--   We need driver data to model price sensitivity by driver. None is provided, so we will generate some.
+-   We need driver data to model price sensitivity by driver. None is provided, so we will predict some.
 -   The idea is to find trips that are most similar within metro area, and assign a synthetic driver id to those trips, assuming the same driver claims the most similar trips.
 -   Create an analytic (numeric) dataset useful for locating similar trips by engineering new features including a numeric day of week, numeric start and end times, numeric metro number, and numeric trip starts during peak hours.
 -   Remove observations that aren't completed trips, so boosted trip records that were not claimed are removed, leaving only claimed trips.
@@ -117,31 +112,18 @@ d %>%
 
 ![](assets/img/cluster_driver_example.png){fig-align="center"}
 
-## Synthetic driver statistics
-
-Tables show head and tail of driver id data.frame
+## Synthetic driver data covariance
 
 ::: {style="font-size: 60%;"}
-```{r}
-d_ids <- read_csv("assets/d_ids.csv")
-
-d_ids %>%
-  group_by(metro_num) %>%
-  summarize(total_trips = length(unique(trip_id)),
-            total_drivers = length(unique(driver_id))) %>%
-  arrange(desc(total_trips)) %>%
-  head(.) %>%
-  kable(.)
-
-d_ids %>%
-  group_by(metro_num) %>%
-  summarize(total_trips = length(unique(trip_id)),
-            total_drivers = length(unique(driver_id))) %>%
-  arrange(desc(total_trips)) %>%
-  tail(.) %>%
-  kable(.)
-```
+How much of the variation in the driver data is explained by the driver-level?
+If we pick two trips at random, how much of the difference in each feature is because they belong to different drivers?
 :::
+
+```{r}
+icc_plot <- read_rds("assets/img/icc_plot.rds")
+icc_plot
+```
+
 
 ## Predict unclaimed rides
 
@@ -281,7 +263,7 @@ Distribution of Actual versus Optimized Boost Offers: Optimized offers cluster m
 Distribution of Actual Minus Optimized Boost Offers: Blue positive values indicate the amount of money likely saved with optimization.
 :::
 
-![](assets/img/p_actual_predicted_boost_difference.png)
+![](assets/img/p_actual_predicted_boost_difference.png){width="16.97in"}
 
 ```{r}
 print(read_rds("assets/summary_optim_boosts.rds"))

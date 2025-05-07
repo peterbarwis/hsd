@@ -356,49 +356,42 @@
 <ul>
 <li>Claim time:
 <ul>
-<li>Removing the incentive to wait (boosts increase as time elapses) and replacing with an incentive to not wait (<em>one-time, limited-time offer)</em> will decrease claim time</li>
-<li>Earlier boost offers will reduce claim time</li>
+<li><em>H1</em>: Switching from escalating boosts to <em>one‑time, limited‑time</em> boosts will shorten claim time.</li>
+<li><em>H2</em>: Making boost offers earlier by using unclaimed predictions will shorten claim time.</li>
 </ul></li>
 <li>Boost size:
 <ul>
-<li>Boost size optimized by the price sensitivity of each driver will reduce overall boost size</li>
+<li><em>H3</em>: Personalizing the boost to the driver’s price sensitivity will lower average boost price.</li>
 </ul></li>
 </ul>
 </section>
 <section id="what-are-we-trying-to-do" class="slide level2">
 <h2>What are we trying to do?</h2>
+<ol type="1">
+<li>Driver model
 <ul>
-<li>Minimize claim time by:
-<ul>
-<li>Predicting trips that will need boosts and then offering boosts earlier</li>
+<li>Identifies drivers in synthetic trip data so we can optimize their behavior</li>
 </ul></li>
-<li>Minimize boost size by:
+<li>Early warning model
 <ul>
-<li><p>Predicting the likelihood that each driver will claim each trip, given a range of boost sizes</p></li>
-<li><p>Selecting the boost size and driver(s) for a trip that push the driver over a claim probability threshold</p></li>
+<li>Flags trips that will go unclaimed so we can act before the wait clock starts</li>
 </ul></li>
-</ul>
-</section>
-<section id="what-are-we-trying-to-do-cont" class="slide level2">
-<h2>What are we trying to do (cont)?</h2>
+<li>Price sensitivity model
 <ul>
-<li>Minimize both claim time and boosts by:
-<ul>
-<li><p>Offering optimal boost sizes on a one-time, limited-time offer basis</p></li>
-<li><p>When the first optimized boost offer goes unclaimed by the most price sensitive driver(s), a second, higher boost offer is made to slightly less price sensitive drivers</p></li>
+<li>Predicts the probability each driver will claim a specific trip across a range of boost amounts</li>
 </ul></li>
-</ul>
+</ol>
 </section>
 <section id="how-will-we-do-it" class="slide level2">
 <h2>How will we do it?</h2>
 <div style="font-size: 90%;">
 <ol type="1">
 <li>Understand the available trip data</li>
-<li>Generate synthetic driver data for demonstration purposes</li>
-<li>Predict rides that are likely to go unclaimed</li>
-<li>Model the price sensitivity of each driver (in each area for each trip)</li>
+<li>Fit driver model(s) and predict driver data</li>
+<li>Fit the unclaimed ride model and predict unclaimed rides</li>
+<li>Fit the price sensitivity model</li>
 <li>Predict the optimal (minimal) boost amount for each driver that will move that trip over the claim probability threshold</li>
-<li>Analyze optimized boost amounts against the original claimed amounts</li>
+<li>Compare optimized boost amounts against actual amounts</li>
 </ol>
 </div>
 </section>
@@ -406,21 +399,13 @@
 <h2>Understanding trip data</h2>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>How many trip observations? 21861</code></pre>
+<pre><code>How many trip observations? 21,861</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>How many unique trips? 17500</code></pre>
+<pre><code>How many unique trips? 17,500</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>What % of observations in the trip data are duplicate trip records? 20%</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>What does the distribution of boosts look like?</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-    0     1     2     3     4     5     6     7     8     9    10    11 
-10000  7500  2785  1204   272    76    16     4     1     1     1     1 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>How do trips break down by geographic area?</code></pre>
@@ -451,13 +436,21 @@ Sacramento Metro              DFW    Orlando Metro
 <pre><code>What are average boost offer amounts by sequence?</code></pre>
 </div>
 
+<div class="cell-output cell-output-stdout">
+<pre><code>What does the distribution of boosts look like?</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    0     1     2     3     4     5     6     7     8     9    10    11 
+10000  7500  2785  1204   272    76    16     4     1     1     1     1 </code></pre>
+</div>
 </div>
 <img data-src="boost_optimization_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
-<section id="synthetic-driver-data" class="slide level2">
-<h2>Synthetic driver data</h2>
+<section id="synthetic-driver-model" class="slide level2">
+<h2>Synthetic driver model</h2>
 <div style="font-size: 70%;">
 <ul>
-<li>We need driver data to model price sensitivity by driver. None is provided, so we will generate some.</li>
+<li>We need driver data to model price sensitivity by driver. None is provided, so we will predict some.</li>
 <li>The idea is to find trips that are most similar within metro area, and assign a synthetic driver id to those trips, assuming the same driver claims the most similar trips.</li>
 <li>Create an analytic (numeric) dataset useful for locating similar trips by engineering new features including a numeric day of week, numeric start and end times, numeric metro number, and numeric trip starts during peak hours.</li>
 <li>Remove observations that aren’t completed trips, so boosted trip records that were not claimed are removed, leaving only claimed trips.</li>
@@ -470,100 +463,13 @@ Sacramento Metro              DFW    Orlando Metro
 <h2>K-Means driver assignment example</h2>
 
 <img data-src="assets/img/cluster_driver_example.png" class="quarto-figure quarto-figure-center r-stretch"></section>
-<section id="synthetic-driver-statistics" class="slide level2">
-<h2>Synthetic driver statistics</h2>
-<p>Tables show head and tail of driver id data.frame</p>
+<section id="synthetic-driver-data-covariance" class="slide level2">
+<h2>Synthetic driver data covariance</h2>
 <div style="font-size: 60%;">
-<div class="cell">
-<div class="cell-output-display">
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th style="text-align: right;">metro_num</th>
-<th style="text-align: right;">total_trips</th>
-<th style="text-align: right;">total_drivers</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: right;">19</td>
-<td style="text-align: right;">4726</td>
-<td style="text-align: right;">945</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">2635</td>
-<td style="text-align: right;">527</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">23</td>
-<td style="text-align: right;">2188</td>
-<td style="text-align: right;">437</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">1733</td>
-<td style="text-align: right;">346</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">27</td>
-<td style="text-align: right;">1271</td>
-<td style="text-align: right;">254</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">11</td>
-<td style="text-align: right;">611</td>
-<td style="text-align: right;">122</td>
-</tr>
-</tbody>
-</table>
+<p>How much of the variation in the driver data is explained by the driver-level? If we pick two trips at random, how much of the difference in each feature is because they belong to different drivers?</p>
 </div>
-<div class="cell-output-display">
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th style="text-align: right;">metro_num</th>
-<th style="text-align: right;">total_trips</th>
-<th style="text-align: right;">total_drivers</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: right;">24</td>
-<td style="text-align: right;">52</td>
-<td style="text-align: right;">10</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">21</td>
-<td style="text-align: right;">25</td>
-<td style="text-align: right;">5</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">26</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: right;">3</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">16</td>
-<td style="text-align: right;">15</td>
-<td style="text-align: right;">3</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">2</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">2</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</section>
+
+<img data-src="boost_optimization_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"></section>
 <section id="predict-unclaimed-rides" class="slide level2">
 <h2>Predict unclaimed rides</h2>
 <div style="font-size: 60%;">
@@ -617,8 +523,8 @@ Sacramento Metro              DFW    Orlando Metro
 
     <script>
 
-      function styleCell_jef94r5kbtau010f0xj5(i, j, css_id) {
-          var table = document.getElementById("tinytable_jef94r5kbtau010f0xj5");
+      function styleCell_jduclghaosak5aoip9j6(i, j, css_id) {
+          var table = document.getElementById("tinytable_jduclghaosak5aoip9j6");
           var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
           if (cell) {
               console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
@@ -628,7 +534,7 @@ Sacramento Metro              DFW    Orlando Metro
           }
       }
       function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_jef94r5kbtau010f0xj5');
+        var table = document.getElementById('tinytable_jduclghaosak5aoip9j6');
         var newRow = table.insertRow(i);
         var newCell = newRow.insertCell(0);
         newCell.setAttribute("colspan", colspan);
@@ -636,8 +542,8 @@ Sacramento Metro              DFW    Orlando Metro
         // this may be unsafe, but innerText does not interpret <br>
         newCell.innerHTML = content;
       }
-      function spanCell_jef94r5kbtau010f0xj5(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_jef94r5kbtau010f0xj5");
+      function spanCell_jduclghaosak5aoip9j6(i, j, rowspan, colspan) {
+        var table = document.getElementById("tinytable_jduclghaosak5aoip9j6");
         const targetRow = table.rows[i];
         const targetCell = targetRow.cells[j];
         for (let r = 0; r < rowspan; r++) {
@@ -667,15 +573,15 @@ Sacramento Metro              DFW    Orlando Metro
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 11, j: 2 }, { i: 11, j: 1 }, { i: 11, j: 0 }, { i: 11, j: 3 }, { i: 11, j: 6 }, { i: 11, j: 5 }, { i: 11, j: 4 }, { i: 11, j: 7 },  ], css_id: 'tinytable_css_pn5d08l1gy3wj8iawf60',}, 
-          { positions: [ { i: 9, j: 1 }, { i: 9, j: 0 }, { i: 9, j: 3 }, { i: 9, j: 2 }, { i: 9, j: 5 }, { i: 9, j: 4 }, { i: 9, j: 7 }, { i: 9, j: 6 },  ], css_id: 'tinytable_css_rbl2qod3uhxj18ynrkal',}, 
-          { positions: [ { i: 0, j: 0 }, { i: 0, j: 3 }, { i: 0, j: 2 }, { i: 0, j: 1 }, { i: 0, j: 4 }, { i: 0, j: 7 }, { i: 0, j: 6 }, { i: 0, j: 5 },  ], css_id: 'tinytable_css_4qxq6cil6ec2ukfc8hg4',}, 
+          { positions: [ { i: 11, j: 2 }, { i: 11, j: 1 }, { i: 11, j: 0 }, { i: 11, j: 3 }, { i: 11, j: 6 }, { i: 11, j: 5 }, { i: 11, j: 4 }, { i: 11, j: 7 },  ], css_id: 'tinytable_css_dhs08388iiqcygflwnb9',}, 
+          { positions: [ { i: 9, j: 1 }, { i: 9, j: 0 }, { i: 9, j: 3 }, { i: 9, j: 2 }, { i: 9, j: 5 }, { i: 9, j: 4 }, { i: 9, j: 7 }, { i: 9, j: 6 },  ], css_id: 'tinytable_css_7a4lbcqxkzv9gmntqg6a',}, 
+          { positions: [ { i: 0, j: 0 }, { i: 0, j: 3 }, { i: 0, j: 2 }, { i: 0, j: 1 }, { i: 0, j: 4 }, { i: 0, j: 7 }, { i: 0, j: 6 }, { i: 0, j: 5 },  ], css_id: 'tinytable_css_2g0l4xg7jxxvluift5pp',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_jef94r5kbtau010f0xj5(cell.i, cell.j, group.css_id);
+                  styleCell_jduclghaosak5aoip9j6(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -683,12 +589,12 @@ Sacramento Metro              DFW    Orlando Metro
 
     <style>
       /* tinytable css entries after */
-      .table td.tinytable_css_pn5d08l1gy3wj8iawf60, .table th.tinytable_css_pn5d08l1gy3wj8iawf60 { border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_rbl2qod3uhxj18ynrkal, .table th.tinytable_css_rbl2qod3uhxj18ynrkal { border-top: solid black 0.1em; }
-      .table td.tinytable_css_4qxq6cil6ec2ukfc8hg4, .table th.tinytable_css_4qxq6cil6ec2ukfc8hg4 { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+      .table td.tinytable_css_dhs08388iiqcygflwnb9, .table th.tinytable_css_dhs08388iiqcygflwnb9 { border-bottom: solid #d3d8dc 0.1em; }
+      .table td.tinytable_css_7a4lbcqxkzv9gmntqg6a, .table th.tinytable_css_7a4lbcqxkzv9gmntqg6a { border-top: solid black 0.1em; }
+      .table td.tinytable_css_2g0l4xg7jxxvluift5pp, .table th.tinytable_css_2g0l4xg7jxxvluift5pp { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_jef94r5kbtau010f0xj5" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="table table-borderless" id="tinytable_jduclghaosak5aoip9j6" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <thead>
         
               <tr>
@@ -867,8 +773,8 @@ attr(,"class")
 
     <script>
 
-      function styleCell_7jh9u5wbvn6a7laji3bt(i, j, css_id) {
-          var table = document.getElementById("tinytable_7jh9u5wbvn6a7laji3bt");
+      function styleCell_7risqia1h6qan6eqvqh0(i, j, css_id) {
+          var table = document.getElementById("tinytable_7risqia1h6qan6eqvqh0");
           var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
           if (cell) {
               console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
@@ -878,7 +784,7 @@ attr(,"class")
           }
       }
       function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_7jh9u5wbvn6a7laji3bt');
+        var table = document.getElementById('tinytable_7risqia1h6qan6eqvqh0');
         var newRow = table.insertRow(i);
         var newCell = newRow.insertCell(0);
         newCell.setAttribute("colspan", colspan);
@@ -886,8 +792,8 @@ attr(,"class")
         // this may be unsafe, but innerText does not interpret <br>
         newCell.innerHTML = content;
       }
-      function spanCell_7jh9u5wbvn6a7laji3bt(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_7jh9u5wbvn6a7laji3bt");
+      function spanCell_7risqia1h6qan6eqvqh0(i, j, rowspan, colspan) {
+        var table = document.getElementById("tinytable_7risqia1h6qan6eqvqh0");
         const targetRow = table.rows[i];
         const targetCell = targetRow.cells[j];
         for (let r = 0; r < rowspan; r++) {
@@ -917,15 +823,15 @@ attr(,"class")
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 13, j: 2 }, { i: 13, j: 1 }, { i: 13, j: 0 }, { i: 13, j: 3 }, { i: 13, j: 6 }, { i: 13, j: 5 }, { i: 13, j: 4 }, { i: 13, j: 7 },  ], css_id: 'tinytable_css_ren742ds14tlb9o9v0z6',}, 
-          { positions: [ { i: 11, j: 1 }, { i: 11, j: 0 }, { i: 11, j: 3 }, { i: 11, j: 2 }, { i: 11, j: 5 }, { i: 11, j: 4 }, { i: 11, j: 7 }, { i: 11, j: 6 },  ], css_id: 'tinytable_css_bgf7peuvpcnjkqowy9vf',}, 
-          { positions: [ { i: 0, j: 0 }, { i: 0, j: 3 }, { i: 0, j: 2 }, { i: 0, j: 1 }, { i: 0, j: 4 }, { i: 0, j: 7 }, { i: 0, j: 6 }, { i: 0, j: 5 },  ], css_id: 'tinytable_css_phar4n0c52p6x6j81l9i',}, 
+          { positions: [ { i: 13, j: 2 }, { i: 13, j: 1 }, { i: 13, j: 0 }, { i: 13, j: 3 }, { i: 13, j: 6 }, { i: 13, j: 5 }, { i: 13, j: 4 }, { i: 13, j: 7 },  ], css_id: 'tinytable_css_l7zi9d7mwabyd8uazyn1',}, 
+          { positions: [ { i: 11, j: 1 }, { i: 11, j: 0 }, { i: 11, j: 3 }, { i: 11, j: 2 }, { i: 11, j: 5 }, { i: 11, j: 4 }, { i: 11, j: 7 }, { i: 11, j: 6 },  ], css_id: 'tinytable_css_pbd9kyreotzrew9a3dkq',}, 
+          { positions: [ { i: 0, j: 0 }, { i: 0, j: 3 }, { i: 0, j: 2 }, { i: 0, j: 1 }, { i: 0, j: 4 }, { i: 0, j: 7 }, { i: 0, j: 6 }, { i: 0, j: 5 },  ], css_id: 'tinytable_css_mtbqaxm32id7ynhxhpcd',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_7jh9u5wbvn6a7laji3bt(cell.i, cell.j, group.css_id);
+                  styleCell_7risqia1h6qan6eqvqh0(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -933,12 +839,12 @@ attr(,"class")
 
     <style>
       /* tinytable css entries after */
-      .table td.tinytable_css_ren742ds14tlb9o9v0z6, .table th.tinytable_css_ren742ds14tlb9o9v0z6 { border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_bgf7peuvpcnjkqowy9vf, .table th.tinytable_css_bgf7peuvpcnjkqowy9vf { border-top: solid black 0.1em; }
-      .table td.tinytable_css_phar4n0c52p6x6j81l9i, .table th.tinytable_css_phar4n0c52p6x6j81l9i { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+      .table td.tinytable_css_l7zi9d7mwabyd8uazyn1, .table th.tinytable_css_l7zi9d7mwabyd8uazyn1 { border-bottom: solid #d3d8dc 0.1em; }
+      .table td.tinytable_css_pbd9kyreotzrew9a3dkq, .table th.tinytable_css_pbd9kyreotzrew9a3dkq { border-top: solid black 0.1em; }
+      .table td.tinytable_css_mtbqaxm32id7ynhxhpcd, .table th.tinytable_css_mtbqaxm32id7ynhxhpcd { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_7jh9u5wbvn6a7laji3bt" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="table table-borderless" id="tinytable_7risqia1h6qan6eqvqh0" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <thead>
         
               <tr>
@@ -956,13 +862,13 @@ attr(,"class")
         <tbody>
                 <tr>
                   <td>driver_id</td>
-                  <td>2635</td>
+                  <td>2644</td>
                   <td>0</td>
-                  <td>1759.0</td>
-                  <td>970.4</td>
+                  <td>1761.9</td>
+                  <td>973.4</td>
                   <td>1.0</td>
-                  <td>1710.0</td>
-                  <td>3492.0</td>
+                  <td>1706.0</td>
+                  <td>3490.0</td>
                 </tr>
                 <tr>
                   <td>metro_num</td>
@@ -1105,15 +1011,15 @@ attr(,"class")
 <pre><code># A tibble: 2 × 3
   .metric  .estimator .estimate
   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-1 roc_auc  binary         0.319
-2 accuracy binary         0.709</code></pre>
+1 roc_auc  binary         0.328
+2 accuracy binary         0.704</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$table
           Truth
 Prediction    0    1
-         0  490  343
-         1  347 1193
+         0  473  338
+         1  365 1197
 
 attr(,"class")
 [1] "conf_mat"</code></pre>
@@ -1145,10 +1051,10 @@ attr(,"class")
 <p>Distribution of Actual Minus Optimized Boost Offers: Blue positive values indicate the amount of money likely saved with optimization.</p>
 </div>
 
-<img data-src="assets/img/p_actual_predicted_boost_difference.png" class="r-stretch"><div class="cell">
+<img data-src="assets/img/p_actual_predicted_boost_difference.png" style="width:16.97in" class="r-stretch"><div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
--23.940   0.350   3.465   6.162   9.660  54.810   32.86 </code></pre>
+-45.710   0.210   3.360   5.972   9.520  54.810   32.86 </code></pre>
 </div>
 </div>
 </section>

@@ -8,6 +8,8 @@ library(ranger) # model fitting engine
 library(modelsummary) # df summary statistics
 library(probably) # probability thresholds
 library(parallel) # parallel computing for optimization
+library(psych) # intra-class correlations
+
 
 
 # Load the provided synthetic trip data  ----------------------------------
@@ -106,7 +108,6 @@ check_for_class <- function(df){
 check_for_class(d_cluster)
 
 
-
 # Run test to ensure no missing data are present in analytic df
 testthat::expect_true(all(check_for_na(d_cluster) == 0))
 
@@ -193,7 +194,8 @@ d_ids %>%
             total_drivers = length(unique(driver_id))) %>%
   arrange(desc(total_trips))
 
-
+# Review total number of assigned drivers
+length(unique(d_ids$driver_id))
 
 # Remove unnecessary metro_num id from ids for later joins
 d_ids <- d_ids %>%
@@ -208,7 +210,42 @@ print(pfviz_plot)
 
 # Store the plot for rendering in presentation
 ggsave("presentation/assets/img/cluster_driver_example.png",
-       pfviz_plot)
+       pfviz_plot, width = 10, height = 6)
+
+
+
+# Generate intraclass correlations for driver data
+# Does clustering by drivers really assign similar trips to the same driver?
+
+# Attach ids to driver training data
+d_cluster_ids <- d_cluster %>%
+  left_join(d_ids, by = "trip_id")
+
+# Define varnames for features to correlate
+cor_vars <- c("total_predicted_duration_mins", 
+              "total_predicted_distance_miles", 
+              "total_predicted_distance_miles_for_fare",
+              "dollars_paid_to_driver",
+              "trip_starts_weekday",
+              "trip_starts_time",
+              "trip_ends_time") 
+
+# Generate within and between correlations
+cor_results <- statsBy(d_cluster_ids[, c("driver_id", cor_vars)],
+                       group = "driver_id",
+                       cor = TRUE)
+
+# Generate plot of ICC by feature
+icc_plot <- tibble(ICC = cor_results$ICC1,
+       Feature = names(cor_results$ICC1)) %>%
+  mutate(Feature = fct_reorder(Feature, ICC)) %>%
+  ggplot(., aes(x = ICC, y = Feature)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "#01AAC7") +
+  theme_minimal()
+
+# Save plot for presentation
+write_rds(icc_plot, "presentation/assets/img/icc_plot.rds")
+
 
 
 
@@ -695,7 +732,7 @@ p_actual_predicted_boost_difference <- minimized_boosts %>%
 # Review the actual minus predicted analysis results and write out for presentation
 print(p_actual_predicted_boost_difference)
 ggsave("presentation/assets/img/p_actual_predicted_boost_difference.png",
-       p_actual_predicted_boost_difference)
+       p_actual_predicted_boost_difference, width = 10, height = 6)
 
 
 
@@ -718,7 +755,7 @@ p_actual_predicted_boost_dist <- minimized_boosts %>%
   gather(key, value, -trip_id) %>%
   mutate(value = value / 100) %>% # convert cents to dollars
   ggplot(., aes(x = value, group = key, color = key)) +
-  geom_density() +
+  geom_density(size = 2) +
   scale_color_manual(values = c("#F57E44", "#01AAC7")) +
   scale_y_continuous("Density") + 
   scale_x_continuous("Boost Dollars", 
@@ -730,7 +767,7 @@ p_actual_predicted_boost_dist <- minimized_boosts %>%
 # Review the density curves and write the results out for presentation
 print(p_actual_predicted_boost_dist)
 ggsave("presentation/assets/img/p_actual_predicted_boost_dist.png",
-       p_actual_predicted_boost_dist)
+       p_actual_predicted_boost_dist, width = 10, height = 6)
 
 
 
