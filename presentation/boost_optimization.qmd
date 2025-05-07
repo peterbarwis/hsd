@@ -280,7 +280,7 @@ print(read_rds("assets/summary_optim_boosts.rds"))
 
 -   We need to solve the cold start problem for new drivers with no price sensitivity data, possibly using a collaborative filtering-style approach.
 
--   Additional analysis of individual driver price sensitivity is warranted. A linear model for each driver might be more persuasive, but would require more data. The nonparametric model does not always show an increase in probability when there is an increase in boost offer size.
+-   Additional analysis of individual driver price sensitivity is warranted. A log-linear model for each driver might be more persuasive, but would require more data. The nonparametric model does not always show an increase in probability when there is an increase in boost offer size.
 
 ## Confidence in approach
 
