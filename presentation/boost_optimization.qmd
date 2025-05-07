@@ -19,7 +19,7 @@ execute:
 
 1.  How can we optimize boosts to get rides claimed earlier?
 2.  How can we optimize boosts to reduce the average cost of rides?
-3.  How can we both minimize boost claim time and minimize average cost of rides?\
+3.  How can we both minimize trip claim time and minimize average cost of rides?\
 
 ## Theory
 
@@ -38,7 +38,7 @@ execute:
 ## What are we trying to do?
 
 1.  Driver model
-    -   Identifies drivers in synthetic trip data so we can optimize their behavior
+    -   Identifies drivers in synthetic trip data so we can influence their behavior
 2.  Early warning model
     -   Flags trips that will go unclaimed so we can act before the wait clock starts
 3.  Price sensitivity model
