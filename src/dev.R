@@ -363,9 +363,8 @@ rf_results %>%
 
 # Examine additional model performance statistics
 unclaimed_auc <- rf_results %>% 
-  mutate(.pred_class = as.numeric(.pred_class)) %>%
   roc_auc(truth = ever_unclaimed, 
-          .pred_1)
+          .pred_0)
 
 unclaimed_accuracy <- rf_results %>% 
   accuracy(truth = ever_unclaimed, 
@@ -384,7 +383,7 @@ write_csv(unclaimed_auc, "presentation/assets/unclaimed_auc.csv")
 write_csv(unclaimed_accuracy, "presentation/assets/unclaimed_accuracy.csv")
 write_rds(unclaimed_conf_mat, "presentation/assets/unclaimed_conf_mat.rds")
 
-
+levels(rf_results$ever_unclaimed)
 
 
 # Refit model with full data for purposes of better predicting trips that will be used to determine driver-specific price sensitivity.
@@ -521,9 +520,8 @@ xgb_results %>%
 
 # Examine and store model performance statistics
 boosted_auc <- xgb_results %>% 
-  mutate(.pred_class = as.numeric(.pred_class)) %>%
   roc_auc(truth = boost_claimed, 
-          .pred_class)
+          .pred_0)
 
 boosted_accuracy <- xgb_results %>% 
   accuracy(truth = boost_claimed, 
