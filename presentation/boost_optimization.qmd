@@ -197,7 +197,7 @@ read_rds("assets/d_unclaimed.rds")
 
 ::: {style="font-size: 80%;"}
 -   These performance statistics are calculated from 1/5 test set.
--   Performance is poor here, but in real life, HopSkipDrive's additional rider and trip location data would very likely produce a powerful model.
+-   Performance is mediocre here, but in real life, HopSkipDrive's additional rider and trip location data would very likely produce a powerful model.
 :::
 
 ```{r}
@@ -226,7 +226,7 @@ read_rds("assets/d_boost.rds")
 
 ::: {style="font-size: 80%;"}
 -   These performance statistics are calculated from 1/5 test set.
--   Performance is poor here, but in real life, HopSkipDrive's additional rider and trip location data would very likely produce a powerful model.
+-   Performance is mediocre here, but in real life, HopSkipDrive's additional rider and trip location data would very likely produce a powerful model.
 :::
 
 ```{r}
